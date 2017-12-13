@@ -1,17 +1,28 @@
 package com.yzyfdf.ge;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.blankj.utilcode.util.ScreenUtils;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.FileCallback;
+import com.lzy.okgo.model.Response;
+
+import java.io.File;
+
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
  * @author MLRC-iOS-CI
  */
+@RuntimePermissions
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, MyDialog.DialogClickCallBack {
 
     private int mScreenWidth;
@@ -74,5 +85,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         sideNow = bean.getSize();
         mGe.reSet(bean);
         invalidate();
+
+        MainActivityPermissionsDispatcher.downloadWithPermissionCheck(this);
+//        download();
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void download() {
+        System.out.println("开始下载");
+        OkGo.<File>get("https://github.com/yuanzaiyuanfang/Lianzi/blob/master/README.md")
+                .tag("")
+                .execute(new FileCallback() {
+                    @Override
+                    public void onSuccess(Response<File> response) {
+                        System.out.println("下载完成");
+                    }
+                });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 }

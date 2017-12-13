@@ -7,6 +7,7 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathEffect;
+import android.graphics.Typeface;
 import android.view.View;
 
 import com.blankj.utilcode.util.SizeUtils;
@@ -37,6 +38,8 @@ public class Ge extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setColor(Color.LTGRAY);
         mTextPaint.setStyle(Paint.Style.FILL);
+        mTextPaint.setTypeface(Typeface.DEFAULT);
+
 
 
     }
@@ -182,5 +185,6 @@ public class Ge extends View {
         mText = bean.getText();
         mModel = bean.getModel();
         mStyle = bean.getStyle();
+//        mTextPaint.setTypeface(Typeface.createFromFile(""));
     }
 }
