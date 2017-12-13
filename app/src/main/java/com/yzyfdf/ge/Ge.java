@@ -22,9 +22,11 @@ public class Ge extends View {
     private int mScreenWidth;
     private int mScreenHeight;
     private int mSide;
+    private String mText = "";
     public static final int crude = 4;
     public static final int fine = 2;
-    private String mText = "";
+    private SettingBean.PracticeModel mModel;
+    private SettingBean.WriteStyle mStyle;
 
     public Ge(Context context) {
         super(context);
@@ -66,12 +68,14 @@ public class Ge extends View {
             //粗
             mPaint.setStrokeWidth(crude);
             canvas.drawLine(start + wifthDeviation, heightDeviation, start + wifthDeviation, heightForm + heightDeviation, mPaint);
-            //细
             if (i == widthNum) {
                 break;
             }
-            mPaint.setStrokeWidth(fine);
-            canvas.drawLine(start + wifthDeviation + leng / 2, heightDeviation, start + wifthDeviation + leng / 2, heightForm + heightDeviation, mPaint);
+            //细
+            if (mStyle == SettingBean.WriteStyle.TIAN || mStyle == SettingBean.WriteStyle.MI) {
+                mPaint.setStrokeWidth(fine);
+                canvas.drawLine(start + wifthDeviation + leng / 2, heightDeviation, start + wifthDeviation + leng / 2, heightForm + heightDeviation, mPaint);
+            }
         }
         //横
         mPaint.setColor(Color.BLACK);
@@ -84,47 +88,51 @@ public class Ge extends View {
                 break;
             }
             //细
-            mPaint.setStrokeWidth(fine);
-            canvas.drawLine(wifthDeviation, start + heightDeviation + leng / 2, widthForm + wifthDeviation, start + heightDeviation + leng / 2, mPaint);
+            if (mStyle == SettingBean.WriteStyle.TIAN || mStyle == SettingBean.WriteStyle.MI) {
+                mPaint.setStrokeWidth(fine);
+                canvas.drawLine(wifthDeviation, start + heightDeviation + leng / 2, widthForm + wifthDeviation, start + heightDeviation + leng / 2, mPaint);
+            }
         }
 
         //斜
-        mPaint.setColor(Color.RED);
-        PathEffect effects = new DashPathEffect(new float[]{5, 5, 5, 5}, 1);
-        mPaint.setPathEffect(effects);
-        for (int i = 0; i <= widthNum; i++) {
-            int start = leng * i;
-            //右斜
-            Path path = new Path();
-            path.moveTo(start + wifthDeviation, heightDeviation);
-            path.lineTo(widthForm + wifthDeviation, widthForm - start + heightDeviation);
-            canvas.drawPath(path, mPaint);
-            //左斜
-            path.moveTo(start + wifthDeviation, heightDeviation);
-            path.lineTo(wifthDeviation, start + heightDeviation);
-            canvas.drawPath(path, mPaint);
-        }
-
-        for (int i = 0; i <= heightNum; i++) {
-            int start = leng * i;
-            //左斜
-            Path path = new Path();
-            int startY = start + heightDeviation;
-            path.moveTo(widthForm + wifthDeviation, startY);
-            if (heightForm - start >= widthForm) {
-                path.lineTo(wifthDeviation, start + heightDeviation + widthForm);
-            } else {
-                path.lineTo(widthForm - (heightForm - start) + wifthDeviation, heightForm + heightDeviation);
+        if (mStyle == SettingBean.WriteStyle.MI) {
+            mPaint.setColor(Color.RED);
+            PathEffect effects = new DashPathEffect(new float[]{5, 5, 5, 5}, 1);
+            mPaint.setPathEffect(effects);
+            for (int i = 0; i <= widthNum; i++) {
+                int start = leng * i;
+                //右斜
+                Path path = new Path();
+                path.moveTo(start + wifthDeviation, heightDeviation);
+                path.lineTo(widthForm + wifthDeviation, widthForm - start + heightDeviation);
+                canvas.drawPath(path, mPaint);
+                //左斜
+                path.moveTo(start + wifthDeviation, heightDeviation);
+                path.lineTo(wifthDeviation, start + heightDeviation);
+                canvas.drawPath(path, mPaint);
             }
-            canvas.drawPath(path, mPaint);
 
-            path.moveTo(wifthDeviation, startY);
-            if (heightForm - start >= widthForm) {
-                path.lineTo(widthForm + wifthDeviation, start + widthForm + heightDeviation);
-            } else {
-                path.lineTo(heightForm - start + wifthDeviation, heightForm + heightDeviation);
+            for (int i = 0; i <= heightNum; i++) {
+                int start = leng * i;
+                //左斜
+                Path path = new Path();
+                int startY = start + heightDeviation;
+                path.moveTo(widthForm + wifthDeviation, startY);
+                if (heightForm - start >= widthForm) {
+                    path.lineTo(wifthDeviation, start + heightDeviation + widthForm);
+                } else {
+                    path.lineTo(widthForm - (heightForm - start) + wifthDeviation, heightForm + heightDeviation);
+                }
+                canvas.drawPath(path, mPaint);
+
+                path.moveTo(wifthDeviation, startY);
+                if (heightForm - start >= widthForm) {
+                    path.lineTo(widthForm + wifthDeviation, start + widthForm + heightDeviation);
+                } else {
+                    path.lineTo(heightForm - start + wifthDeviation, heightForm + heightDeviation);
+                }
+                canvas.drawPath(path, mPaint);
             }
-            canvas.drawPath(path, mPaint);
         }
 
         //字
@@ -135,13 +143,20 @@ public class Ge extends View {
             for (int j = 0; j < widthNum; j++) {
                 String s = "";
                 try {
-                    s = mText.substring(widthNum * i + j, widthNum * i + j + 1);
+                    if (mModel == SettingBean.PracticeModel.SINGLE) {
+                        s = mText.substring(i, i + 1);
+                    } else {
+                        s = mText.substring(widthNum * i + j, widthNum * i + j + 1);
+                    }
                 } catch (Exception e) {
                     break H;
                 }
                 int x = wifthDeviation + leng * j + leng / 2;
                 int y = heightDeviation + (leng * i + leng * (i + 1) - metricsInt.top - metricsInt.bottom) / 2;
                 canvas.drawText(s, x, y, mTextPaint);
+                if (mModel == SettingBean.PracticeModel.SINGLE) {
+                    break;
+                }
             }
         }
 
@@ -162,8 +177,10 @@ public class Ge extends View {
         mSide = side;
     }
 
-
-    public void setText(String text) {
-        mText = text;
+    public void reSet(SettingBean bean) {
+        mSide = bean.getSize();
+        mText = bean.getText();
+        mModel = bean.getModel();
+        mStyle = bean.getStyle();
     }
 }

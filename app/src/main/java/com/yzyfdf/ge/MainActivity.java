@@ -1,5 +1,7 @@
 package com.yzyfdf.ge;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -26,6 +28,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
 
         mRootView = (FrameLayout) findViewById(R.id.rootView);
         mRootView.setOnLongClickListener(this);
@@ -61,14 +68,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
 
     @Override
-    public void positiveClick(int what, String text) {
-        System.out.println("seekBar = " + what);
-
-        sideNow = what;
+    public void positiveClick(SettingBean bean) {
         mGe.setScreenWidth(ScreenUtils.getScreenWidth());
         mGe.setScreenHeight(ScreenUtils.getScreenHeight());
-        mGe.setSize(sideNow);
-        mGe.setText(text);
+        sideNow = bean.getSize();
+        mGe.reSet(bean);
         invalidate();
     }
 }
